@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFrameworks>netstandard2.0;netstandard2.1</TargetFrameworks>
+        <AssemblyName>FT.AmoCRM</AssemblyName>
+        <RootNamespace>FT.AmoCRM</RootNamespace>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <IsPackable>true</IsPackable>
+        <PackageId>FT.AmoCRM</PackageId>
+        <Version>1.0.0</Version>
+        <Authors>FT.AmoCRM contributors</Authors>
+        <Description>.NET Standard client for the amoCRM API v4 with OAuth, typed CRM resources, filters, custom fields, tasks and webhooks.</Description>
+        <PackageTags>amocrm;crm;api;oauth;rest;dotnet</PackageTags>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Include="README.md" Pack="true" PackagePath="" />
+        <None Include="LICENSE.txt" Pack="true" PackagePath="" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Remove="AmoCRM.Tests\**" />
+        <None Remove="AmoCRM.Tests\**" />
+        <EmbeddedResource Remove="AmoCRM.Tests\**" />
+    </ItemGroup>
+
+  
+
+</Project>

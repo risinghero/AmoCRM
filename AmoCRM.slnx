@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="AmoCRM.csproj" />
+  <Project Path="AmoCRM.Tests/AmoCRM.Tests.csproj" />
+</Solution>
