@@ -56,6 +56,8 @@ jobs:
       - name: Login to NuGet.org
         uses: NuGet/login@v1
         id: nuget-login
+        with:
+          user: RisingHeroMan
 
       - name: Publish to NuGet.org
         run: >-
