@@ -1,0 +1,60 @@
+name: Publish NuGet package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.x'
+
+      - name: Extract package version
+        id: version
+        shell: bash
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+([.-][0-9A-Za-z.-]+)?$ ]]; then
+            echo "Invalid package version: $VERSION"
+            exit 1
+          fi
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Restore library
+        run: dotnet restore AmoCRM.csproj
+
+      - name: Restore tests
+        run: dotnet restore AmoCRM.Tests/AmoCRM.Tests.csproj
+
+      - name: Build library
+        run: dotnet build AmoCRM.csproj --configuration Release --no-restore
+
+      - name: Run tests
+        run: dotnet test AmoCRM.Tests/AmoCRM.Tests.csproj --configuration Release --no-restore --verbosity normal
+
+      - name: Pack NuGet package
+        run: >-
+          dotnet pack AmoCRM.csproj
+          --configuration Release
+          --no-restore
+          --output ./nupkg
+          -p:Version=${{ steps.version.outputs.version }}
+
+      - name: Publish to NuGet.org
+        run: >-
+          dotnet nuget push "./nupkg/FT.AmoCRM.${{ steps.version.outputs.version }}.nupkg"
+          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --source https://api.nuget.org/v3/index.json
+          --skip-duplicate
