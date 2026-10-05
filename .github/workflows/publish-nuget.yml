@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
   publish:
@@ -52,9 +53,13 @@ jobs:
           --output ./nupkg
           -p:Version=${{ steps.version.outputs.version }}
 
+      - name: Login to NuGet.org
+        uses: NuGet/login@v1
+        id: nuget-login
+
       - name: Publish to NuGet.org
         run: >-
           dotnet nuget push "./nupkg/FT.AmoCRM.${{ steps.version.outputs.version }}.nupkg"
-          --api-key "${{ secrets.NUGET_API_KEY }}"
+          --api-key "${{ steps.nuget-login.outputs.NUGET_API_KEY }}"
           --source https://api.nuget.org/v3/index.json
           --skip-duplicate
