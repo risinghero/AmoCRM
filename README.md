@@ -58,6 +58,23 @@ var client = new AmoCrmClient(
 
 Если refresh token отсутствует, по истечении access token будет выброшено `InvalidOperationException`.
 
+## Фиксированный токен интеграции
+
+Для интеграций, которым amoCRM выдает готовый токен, можно использовать его напрямую как Bearer-токен. Получите токен в настройках интеграции amoCRM и не передавайте OAuth credentials:
+
+```csharp
+var client = new AmoCrmClient(
+	new HttpClient(),
+	"my-account.amocrm.ru",
+	"integration-access-token");
+
+var deals = await client.Deals.ListAsync();
+```
+
+Клиент не обновляет такой токен: он отправляется как `Authorization: Bearer ...` при каждом запросе. Храните его в защищенной конфигурации/секрет-хранилище, не публикуйте в исходном коде. Отозванный или недействительный токен приведет к `AmoCrmApiException` от API. Для OAuth-токенов с refresh используйте OAuth-сценарий выше.
+
+Документация amoCRM: [одноразовые токены для интеграций](https://www.amocrm.ru/developers/content/oauth/disposable-tokens).
+
 ## Работа с ресурсами
 
 ```csharp

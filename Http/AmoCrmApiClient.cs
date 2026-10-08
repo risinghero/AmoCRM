@@ -15,11 +15,11 @@ namespace FT.AmoCRM.Http
     {
         /// <summary>Creates an authenticated API client.</summary>
         private readonly HttpClient _httpClient;
-        private readonly AmoCrmTokenProvider _tokenProvider;
+        private readonly IAmoCrmAccessTokenProvider _tokenProvider;
         private readonly Uri _baseUri;
         private readonly AmoCrmClientOptions _options;
 
-        public AmoCrmApiClient(HttpClient httpClient, string accountDomain, AmoCrmTokenProvider tokenProvider, AmoCrmClientOptions options = null)
+        public AmoCrmApiClient(HttpClient httpClient, string accountDomain, IAmoCrmAccessTokenProvider tokenProvider, AmoCrmClientOptions options = null)
         {
             _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             _tokenProvider = tokenProvider ?? throw new ArgumentNullException(nameof(tokenProvider));

@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 namespace FT.AmoCRM.Authentication
 {
     /// <summary>Provides valid access tokens and refreshes them when necessary.</summary>
-    public sealed class AmoCrmTokenProvider
+    public sealed class AmoCrmTokenProvider : IAmoCrmAccessTokenProvider
     {
         /// <summary>Creates a token provider.</summary>
         private readonly AmoCrmOAuthClient _oauthClient;

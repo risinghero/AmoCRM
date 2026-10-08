@@ -1,6 +1,7 @@
 using System;
 using System.Net;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using FT.AmoCRM;
@@ -34,6 +35,25 @@ namespace FT.AmoCRM.Tests
 
             Assert.Equal("new-token", accessToken);
             Assert.Equal("new-token", provider.CurrentToken.AccessToken);
+        }
+
+        [Fact]
+        public async Task FixedTokenClientSendsBearerTokenWithoutOAuth()
+        {
+            AuthenticationHeaderValue authorization = null;
+            var handler = new StubHandler((request, count) =>
+            {
+                authorization = request.Headers.Authorization;
+                return JsonResponse("{\"_embedded\":{\"items\":[]}}");
+            });
+            var client = new AmoCrmClient(new HttpClient(handler), "example.amocrm.ru", "integration-token");
+
+            await client.Deals.ListAsync();
+
+            Assert.Equal("Bearer", authorization.Scheme);
+            Assert.Equal("integration-token", authorization.Parameter);
+            Assert.IsType<AmoCrmFixedTokenProvider>(client.AccessTokenProvider);
+            Assert.Null(client.OAuth);
         }
 
         [Fact]

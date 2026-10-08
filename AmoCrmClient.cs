@@ -22,7 +22,25 @@ namespace FT.AmoCRM
             HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
             OAuth = new AmoCrmOAuthClient(HttpClient, oauthOptions);
             TokenProvider = new AmoCrmTokenProvider(accountDomain, token, OAuth);
-            Api = new AmoCrmApiClient(HttpClient, accountDomain, TokenProvider, clientOptions);
+            AccessTokenProvider = TokenProvider;
+            Api = new AmoCrmApiClient(HttpClient, accountDomain, AccessTokenProvider, clientOptions);
+            InitializeServices();
+        }
+
+        /// <summary>Creates a client using a pre-issued integration token without OAuth refresh.</summary>
+        /// <param name="httpClient">The HTTP client used for requests.</param>
+        /// <param name="accountDomain">The amoCRM account domain.</param>
+        /// <param name="fixedAccessToken">The integration token issued by amoCRM.</param>
+        /// <param name="clientOptions">Optional API retry settings.</param>
+        public AmoCrmClient(HttpClient httpClient, string accountDomain, string fixedAccessToken, AmoCrmClientOptions clientOptions = null)
+        {
+            if (string.IsNullOrWhiteSpace(accountDomain)) throw new ArgumentException("Account domain is required.", nameof(accountDomain));
+            _accountDomain = accountDomain;
+            HttpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            OAuth = null;
+            TokenProvider = null;
+            AccessTokenProvider = new AmoCrmFixedTokenProvider(fixedAccessToken);
+            Api = new AmoCrmApiClient(HttpClient, accountDomain, AccessTokenProvider, clientOptions);
             InitializeServices();
         }
 
@@ -32,6 +50,8 @@ namespace FT.AmoCRM
         public AmoCrmOAuthClient OAuth { get; }
         /// <summary>The token provider used by API requests.</summary>
         public AmoCrmTokenProvider TokenProvider { get; }
+        /// <summary>The access-token provider used by API requests in either authentication mode.</summary>
+        public IAmoCrmAccessTokenProvider AccessTokenProvider { get; }
         /// <summary>The low-level authenticated API client.</summary>
         public AmoCrmApiClient Api { get; }
         /// <summary>The deals service.</summary>
@@ -57,6 +77,7 @@ namespace FT.AmoCRM
         /// <returns>The received OAuth token.</returns>
         public async Task<AmoCrmToken> AuthorizeAsync(string authorizationCode, CancellationToken cancellationToken = default(CancellationToken))
         {
+            if (OAuth == null) throw new InvalidOperationException("Authorization-code flow is unavailable when using a fixed integration token.");
             var token = await OAuth.ExchangeCodeAsync(GetAccountDomain(), authorizationCode, cancellationToken).ConfigureAwait(false);
             TokenProvider.SetToken(token);
             return token;
