@@ -42,8 +42,8 @@ namespace FT.AmoCRM.Resources
         public async Task<T> CreateAsync(T entity, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
-            var result = await ApiClient.SendAsync<List<T>>(HttpMethod.Post, ResourceName, new[] { entity }, cancellationToken).ConfigureAwait(false);
-            return result == null || result.Count == 0 ? null : result[0];
+            var result = await ApiClient.SendAsync<AmoCrmPage<T>>(HttpMethod.Post, ResourceName, new[] { entity }, cancellationToken).ConfigureAwait(false);
+            return result == null || result.Items.Count == 0 ? null : result.Items[0];
         }
 
         /// <summary>Updates an entity.</summary>
@@ -51,8 +51,8 @@ namespace FT.AmoCRM.Resources
         {
             if (entity == null) throw new ArgumentNullException(nameof(entity));
             if (entity.Id <= 0) throw new ArgumentException("An entity ID is required for update.", nameof(entity));
-            var result = await ApiClient.SendAsync<List<T>>(new HttpMethod("PATCH"), ResourceName + "/" + entity.Id, entity, cancellationToken).ConfigureAwait(false);
-            return result == null || result.Count == 0 ? null : result[0];
+            var result = await ApiClient.SendAsync<AmoCrmPage<T>>(new HttpMethod("PATCH"), ResourceName + "/" + entity.Id, entity, cancellationToken).ConfigureAwait(false);
+            return result == null || result.Items.Count == 0 ? null : result.Items[0];
         }
     }
 
